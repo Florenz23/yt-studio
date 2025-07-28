@@ -38,7 +38,10 @@ Please respond with exactly 5 titles, one per line, with no numbering or additio
       contents: prompt,
     });
 
-    const text = response.text.trim();
+    const text = response.text?.trim();
+    if (!text) {
+      throw new Error('No response text received from Gemini');
+    }
     const titles = text.split('\n').filter(title => title.trim().length > 0);
     
     if (titles.length !== 5) {
