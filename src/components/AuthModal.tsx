@@ -47,10 +47,12 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
   };
 
   const signInWithGoogle = async () => {
+    const redirectUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+    
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}`,
+        redirectTo: redirectUrl,
       },
     });
     
