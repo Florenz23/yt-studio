@@ -10,10 +10,11 @@ YouTube Title Generator with Google OAuth authentication, Supabase backend, and 
 ```
 
 ### Important Commands:
-- `pnpm install` - Install dependencies
+- `pnpm install` - Install dependencies (includes `prisma generate` via postinstall)
 - `pnpm run dev` - Start development server
-- `pnpm run build` - Build for production
+- `pnpm run build` - Generate Prisma client and build for production
 - `pnpm run typecheck` - Run TypeScript checks
+- `npx prisma generate` - Generate Prisma client manually
 - `npx prisma migrate dev` - Run database migrations
 
 ## Environment Variables Required
@@ -98,6 +99,8 @@ model events {
 1. **Lockfile sync**: Always use `pnpm install` to keep lockfile updated
 2. **OAuth redirects**: Ensure `NEXT_PUBLIC_SITE_URL` is set correctly for production
 3. **Database migrations**: Run `npx prisma migrate dev` after schema changes
+4. **Prisma Client**: If you get "Module has no exported member 'PrismaClient'", run `npx prisma generate`
+5. **Build scripts**: The `postinstall` script ensures Prisma client is generated after dependency installation
 
 ## Deployment
 - Platform: Vercel
