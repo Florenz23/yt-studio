@@ -9,7 +9,7 @@ import { TitleCard } from './TitleCard';
 import { supabase } from '@/lib/supabase';
 import type { User } from '@supabase/supabase-js';
 import { AuthModal } from './AuthModal';
-import { trpc } from '@/lib/trpc';
+import { trpc } from './TRPCProvider';
 
 export function TitleGenerator() {
   const [description, setDescription] = useState(DEFAULT_DESCRIPTION);
