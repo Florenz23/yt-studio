@@ -31,7 +31,8 @@ export const eventsRouter = router({
         return { success: true };
       } catch (error) {
         console.error('Failed to track event:', error);
-        throw new Error('Failed to track event');
+        // Don't throw - allow the app to continue working even if tracking fails
+        return { success: false, error: 'Failed to track event' };
       }
     }),
 
@@ -40,6 +41,16 @@ export const eventsRouter = router({
       userId: z.string(),
     }))
     .query(async ({ input }) => {
+      // If no database connection, return default values
+      if (!process.env.DATABASE_URL) {
+        console.warn('No DATABASE_URL configured, returning default generation count');
+        return {
+          count: 0,
+          remaining: GENERATION_LIMIT,
+          limit: GENERATION_LIMIT,
+        };
+      }
+
       try {
         const count = await prisma.events.count({
           where: {
@@ -68,6 +79,15 @@ export const eventsRouter = router({
       userId: z.string(),
     }))
     .query(async ({ input }) => {
+      // If no database connection, allow generation
+      if (!process.env.DATABASE_URL) {
+        console.warn('No DATABASE_URL configured, allowing generation');
+        return {
+          canGenerate: true,
+          remaining: GENERATION_LIMIT,
+        };
+      }
+
       try {
         const count = await prisma.events.count({
           where: {

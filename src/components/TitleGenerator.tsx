@@ -55,21 +55,29 @@ export function TitleGenerator() {
     
     setIsGenerating(true);
     try {
-      // Track the generation event
-      await trackEventMutation.mutateAsync({
-        userId: user.id,
-        eventType: 'title_generation',
-        eventCategory: 'product',
-        eventAction: 'generate',
-        eventLabel: 'button_click',
-        eventValue: 1,
-      });
+      // Track the generation event (don't fail if tracking fails)
+      try {
+        await trackEventMutation.mutateAsync({
+          userId: user.id,
+          eventType: 'title_generation',
+          eventCategory: 'product',
+          eventAction: 'generate',
+          eventLabel: 'button_click',
+          eventValue: 1,
+        });
+      } catch (trackingError) {
+        console.warn('Failed to track event, but continuing with generation:', trackingError);
+      }
 
       const newTitles = await generateTitles(description);
       setTitles(newTitles);
       
-      // Refetch generation data to update the UI
-      refetchGenerationData();
+      // Refetch generation data to update the UI (don't fail if this fails)
+      try {
+        refetchGenerationData();
+      } catch (refetchError) {
+        console.warn('Failed to refetch generation data:', refetchError);
+      }
     } catch (error) {
       console.error('Error generating titles:', error);
       alert('Failed to generate titles. Please try again.');

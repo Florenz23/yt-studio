@@ -47,7 +47,12 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
   };
 
   const signInWithGoogle = async () => {
-    const redirectUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+    // Get the current origin, but ensure it's the production URL in production
+    const currentOrigin = window.location.origin;
+    const isLocalhost = currentOrigin.includes('localhost');
+    const redirectUrl = isLocalhost 
+      ? currentOrigin 
+      : process.env.NEXT_PUBLIC_SITE_URL || currentOrigin;
     
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
