@@ -9,6 +9,7 @@ import { TitleCard } from './TitleCard';
 import { supabase } from '@/lib/supabase';
 import type { User } from '@supabase/supabase-js';
 import { AuthModal } from './AuthModal';
+import { trpc } from '@/lib/trpc';
 
 export function TitleGenerator() {
   const [description, setDescription] = useState(DEFAULT_DESCRIPTION);
@@ -17,6 +18,13 @@ export function TitleGenerator() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [showAuthModal, setShowAuthModal] = useState(false);
+
+  // tRPC hooks
+  const trackEventMutation = trpc.events.trackEvent.useMutation();
+  const { data: generationData, refetch: refetchGenerationData } = trpc.events.getUserGenerationCount.useQuery(
+    { userId: user?.id || '' },
+    { enabled: !!user?.id }
+  );
 
   useEffect(() => {
     // Get initial user
@@ -39,14 +47,32 @@ export function TitleGenerator() {
   const handleGenerate = async () => {
     if (!description.trim() || !user) return;
     
+    // Check if user has reached generation limit
+    if (generationData && generationData.remaining <= 0) {
+      alert(`You've reached your limit of ${generationData.limit} generations. Please try again later.`);
+      return;
+    }
+    
     setIsGenerating(true);
     try {
+      // Track the generation event
+      await trackEventMutation.mutateAsync({
+        userId: user.id,
+        eventType: 'title_generation',
+        eventCategory: 'product',
+        eventAction: 'generate',
+        eventLabel: 'button_click',
+        eventValue: 1,
+      });
+
       const newTitles = await generateTitles(description);
       setTitles(newTitles);
+      
+      // Refetch generation data to update the UI
+      refetchGenerationData();
     } catch (error) {
       console.error('Error generating titles:', error);
-      // You could add a toast notification here
-      alert('Failed to generate titles. Please check your API key and try again.');
+      alert('Failed to generate titles. Please try again.');
     } finally {
       setIsGenerating(false);
     }
@@ -71,6 +97,15 @@ export function TitleGenerator() {
         </p>
       </div>
 
+      {/* Generation Counter */}
+      {user && generationData && (
+        <div className="text-center">
+          <p className="text-white/80 text-sm">
+            Generations remaining: <span className="font-semibold text-white">{generationData.remaining}</span> / {generationData.limit}
+          </p>
+        </div>
+      )}
+
       {/* Input Section */}
       <div className="space-y-4">
         <label htmlFor="description" className="block text-sm font-medium text-white/90">
@@ -87,7 +122,7 @@ export function TitleGenerator() {
         <div className="flex gap-3">
           <button
             onClick={user ? handleGenerate : () => setShowAuthModal(true)}
-            disabled={(!user && loading) || (!!user && (!description.trim() || isGenerating))}
+            disabled={(!user && loading) || (!!user && (!description.trim() || isGenerating || (generationData?.remaining === 0)))}
             className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-medium rounded-lg hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-400/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
           >
             {user ? (
@@ -95,7 +130,9 @@ export function TitleGenerator() {
             ) : (
               <Lock className="w-4 h-4" />
             )}
-            {user && isGenerating ? 'Generating...' : 'Generate Titles'}
+            {user && isGenerating ? 'Generating...' : 
+             user && generationData?.remaining === 0 ? 'Limit Reached' : 
+             'Generate Titles'}
           </button>
           
           {titles.length > 0 && user && (

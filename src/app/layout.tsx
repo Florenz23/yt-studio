@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthButton } from "@/components/AuthButton";
+import TRPCProvider from "@/components/TRPCProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,22 +29,24 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-          {/* Header with Auth */}
-          <header className="w-full px-6 py-4">
-            <div className="max-w-6xl mx-auto flex justify-between items-center">
-              <div className="text-white font-semibold text-lg">
-                YT Studio
+        <TRPCProvider>
+          <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+            {/* Header with Auth */}
+            <header className="w-full px-6 py-4">
+              <div className="max-w-6xl mx-auto flex justify-between items-center">
+                <div className="text-white font-semibold text-lg">
+                  YT Studio
+                </div>
+                <AuthButton />
               </div>
-              <AuthButton />
-            </div>
-          </header>
-          
-          {/* Main Content */}
-          <main className="px-6 py-8">
-            {children}
-          </main>
-        </div>
+            </header>
+            
+            {/* Main Content */}
+            <main className="px-6 py-8">
+              {children}
+            </main>
+          </div>
+        </TRPCProvider>
       </body>
     </html>
   );
