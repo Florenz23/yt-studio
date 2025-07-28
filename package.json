@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@google/genai": "^1.0.0",
+    "@supabase/ssr": "^0.6.1",
+    "@supabase/supabase-js": "^2.52.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.525.0",
     "next": "15.4.4",
@@ -24,5 +26,6 @@
     "@types/react-dom": "^19",
     "tailwindcss": "^4",
     "typescript": "^5"
-  }
+  },
+  "packageManager": "pnpm@10.7.1+sha512.2d92c86b7928dc8284f53494fb4201f983da65f0fb4f0d40baafa5cf628fa31dae3e5968f12466f17df7e97310e30f343a648baea1b9b350685dafafffdf5808"
 }

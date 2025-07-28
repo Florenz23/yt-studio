@@ -1,19 +1,43 @@
 "use client";
 
-import { useState } from 'react';
-import { Wand2, RotateCcw } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Wand2, RotateCcw, Lock } from 'lucide-react';
 import { generateTitles } from '@/lib/titleGenerator';
 import { DEFAULT_DESCRIPTION } from '@/lib/constants';
 import { TitleVariation } from '@/lib/types';
 import { TitleCard } from './TitleCard';
+import { supabase } from '@/lib/supabase';
+import type { User } from '@supabase/supabase-js';
+import { AuthModal } from './AuthModal';
 
 export function TitleGenerator() {
   const [description, setDescription] = useState(DEFAULT_DESCRIPTION);
   const [titles, setTitles] = useState<TitleVariation[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+
+  useEffect(() => {
+    // Get initial user
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+      setLoading(false);
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setUser(session?.user ?? null);
+        setLoading(false);
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleGenerate = async () => {
-    if (!description.trim()) return;
+    if (!description.trim() || !user) return;
     
     setIsGenerating(true);
     try {
@@ -27,6 +51,7 @@ export function TitleGenerator() {
       setIsGenerating(false);
     }
   };
+
 
   const handleRegenerate = () => {
     if (titles.length > 0) {
@@ -61,15 +86,19 @@ export function TitleGenerator() {
         
         <div className="flex gap-3">
           <button
-            onClick={handleGenerate}
-            disabled={!description.trim() || isGenerating}
+            onClick={user ? handleGenerate : () => setShowAuthModal(true)}
+            disabled={(!user && loading) || (user && (!description.trim() || isGenerating))}
             className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-medium rounded-lg hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-400/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
           >
-            <Wand2 className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
-            {isGenerating ? 'Generating...' : 'Generate Titles'}
+            {user ? (
+              <Wand2 className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
+            ) : (
+              <Lock className="w-4 h-4" />
+            )}
+            {user && isGenerating ? 'Generating...' : 'Generate Titles'}
           </button>
           
-          {titles.length > 0 && (
+          {titles.length > 0 && user && (
             <button
               onClick={handleRegenerate}
               disabled={isGenerating}
@@ -101,6 +130,11 @@ export function TitleGenerator() {
           </div>
         </div>
       )}
+
+      <AuthModal 
+        isOpen={showAuthModal} 
+        onClose={() => setShowAuthModal(false)} 
+      />
     </div>
   );
 }
