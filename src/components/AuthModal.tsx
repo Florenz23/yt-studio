@@ -50,9 +50,19 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
     // Get the current origin, but ensure it's the production URL in production
     const currentOrigin = window.location.origin;
     const isLocalhost = currentOrigin.includes('localhost');
+    const envSiteUrl = process.env.NEXT_PUBLIC_SITE_URL;
     const redirectUrl = isLocalhost 
       ? currentOrigin 
-      : process.env.NEXT_PUBLIC_SITE_URL || currentOrigin;
+      : envSiteUrl || currentOrigin;
+    
+    // Debug logging
+    console.log('🔍 OAuth Debug Info:');
+    console.log('- Current origin:', currentOrigin);
+    console.log('- Is localhost:', isLocalhost);
+    console.log('- NEXT_PUBLIC_SITE_URL env var:', envSiteUrl);
+    console.log('- Final redirect URL:', redirectUrl);
+    console.log('- All env vars starting with NEXT_PUBLIC_:', 
+      Object.keys(process.env).filter(key => key.startsWith('NEXT_PUBLIC_')));
     
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
@@ -62,6 +72,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
     });
     
     if (error) {
+      console.error('🚨 Google OAuth error:', error);
       setError(error.message);
     }
   };
