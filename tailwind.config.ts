@@ -1,5 +1,5 @@
 import { type Config } from "tailwindcss";
-import { fontFamily } from "tailwindcss/defaultTheme";
+import defaultTheme from "tailwindcss/defaultTheme";
 
 export default {
   darkMode: ["class"],
@@ -18,8 +18,8 @@ export default {
         "3xl": "1984px",
       },
       fontFamily: {
-        sans: ["var(--font-scry)", "var(--font-inter)", ...fontFamily.sans],
-        mono: ["var(--font-inter)", ...fontFamily.mono],
+        sans: ["var(--font-geist-sans)", ...defaultTheme.fontFamily.sans],
+        mono: ["var(--font-geist-mono)", ...defaultTheme.fontFamily.mono],
         material: ["var(--font-material-symbols)"],
       },
       colors: {
