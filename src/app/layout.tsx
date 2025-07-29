@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthButton } from "@/components/AuthButton";
 import { TRPCProvider } from "@/components/TRPCProvider";
+import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,28 +27,40 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <TRPCProvider>
-          <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-            {/* Header with Auth */}
-            <header className="w-full px-6 py-4">
-              <div className="max-w-6xl mx-auto flex justify-between items-center">
-                <div className="text-white font-semibold text-lg">
-                  YT Studio
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem={false}
+          disableTransitionOnChange
+        >
+          <TRPCProvider>
+            <div className="min-h-screen bg-background">
+              {/* Header with Auth */}
+              <header className="w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+                  <div className="text-foreground font-semibold text-lg">
+                    YT Studio
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <ThemeSwitcher />
+                    <AuthButton />
+                  </div>
                 </div>
-                <AuthButton />
-              </div>
-            </header>
-            
-            {/* Main Content */}
-            <main className="px-6 py-8">
-              {children}
-            </main>
-          </div>
-        </TRPCProvider>
+              </header>
+              
+              {/* Main Content */}
+              <main className="px-6 py-8">
+                <div className="max-w-6xl mx-auto">
+                  {children}
+                </div>
+              </main>
+            </div>
+          </TRPCProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

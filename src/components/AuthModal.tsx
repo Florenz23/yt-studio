@@ -4,6 +4,9 @@ import { useState } from 'react';
 import { X, Mail, Lock, User } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { getSiteUrl } from '@/lib/env';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -69,97 +72,98 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-slate-800 rounded-lg p-6 w-full max-w-md mx-4">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold text-white">
-            {isSignUp ? 'Sign Up' : 'Sign In'}
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-white/70 hover:text-white"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-white/90 mb-2">
-              Email
-            </label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-white/50" />
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400/50"
-                placeholder="Enter your email"
-                required
-              />
-            </div>
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+      <Card className="w-full max-w-md mx-4">
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <CardTitle>{isSignUp ? 'Sign Up' : 'Sign In'}</CardTitle>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+            >
+              <X className="w-4 h-4" />
+            </Button>
           </div>
-
-          <div>
-            <label className="block text-sm font-medium text-white/90 mb-2">
-              Password
-            </label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-white/50" />
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400/50"
-                placeholder="Enter your password"
-                required
-                minLength={6}
-              />
+          <CardDescription>
+            {isSignUp ? 'Create an account to start generating titles' : 'Sign in to your account'}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Email</label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="pl-10"
+                  placeholder="Enter your email"
+                  required
+                />
+              </div>
             </div>
-          </div>
 
-          {error && (
-            <p className="text-red-400 text-sm">{error}</p>
-          )}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Password</label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="pl-10"
+                  placeholder="Enter your password"
+                  required
+                  minLength={6}
+                />
+              </div>
+            </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-medium rounded-lg hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-400/50 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? 'Loading...' : (isSignUp ? 'Sign Up' : 'Sign In')}
-          </button>
-        </form>
+            {error && (
+              <p className="text-destructive text-sm">{error}</p>
+            )}
 
-        <div className="mt-4">
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full"
+            >
+              {loading ? 'Loading...' : (isSignUp ? 'Sign Up' : 'Sign In')}
+            </Button>
+          </form>
+
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/20" />
+              <div className="w-full border-t border-border" />
             </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-slate-800 text-white/70">Or</span>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">Or</span>
             </div>
           </div>
 
-          <button
+          <Button
+            variant="outline"
             onClick={signInWithGoogle}
-            className="w-full mt-4 py-2 bg-white/10 border border-white/20 text-white font-medium rounded-lg hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-white/20 flex items-center justify-center gap-2"
+            className="w-full"
           >
-            <User className="w-4 h-4" />
+            <User className="w-4 h-4 mr-2" />
             Continue with Google
-          </button>
-        </div>
+          </Button>
 
-        <div className="mt-4 text-center">
-          <button
-            onClick={() => setIsSignUp(!isSignUp)}
-            className="text-blue-400 hover:text-blue-300 text-sm"
-          >
-            {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
-          </button>
-        </div>
-      </div>
+          <div className="text-center">
+            <Button
+              variant="link"
+              onClick={() => setIsSignUp(!isSignUp)}
+              className="text-sm"
+            >
+              {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
