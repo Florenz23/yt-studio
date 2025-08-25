@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { TitleVariation } from '@/lib/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
 interface TitleCardProps {
@@ -24,24 +25,40 @@ export function TitleCard({ title }: TitleCardProps) {
     }
   };
 
+  const getCharacterStatus = () => {
+    if (title.characterCount >= 55 && title.characterCount <= 70) {
+      return { variant: "success" as const, label: "Optimal" };
+    } else if (title.characterCount >= 45 && title.characterCount < 55) {
+      return { variant: "warning" as const, label: "Good" };
+    } else {
+      return { variant: "destructive" as const, label: "Adjust" };
+    }
+  };
+
+  const charStatus = getCharacterStatus();
+
   return (
-    <Card className="group relative hover:bg-accent/50 transition-all duration-200">
-      <CardContent className="p-4">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex-1 min-w-0">
-            <p className="text-card-foreground font-medium leading-relaxed mb-2 break-words">
+    <Card className="group relative hover:shadow-md transition-all duration-200 border-l-4 border-l-transparent hover:border-l-primary">
+      <CardContent className="p-6">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1 min-w-0 space-y-3">
+            <p className="text-foreground font-medium text-lg leading-relaxed break-words group-hover:text-primary transition-colors">
               {title.title}
             </p>
-            <div className="flex items-center gap-3 text-sm text-muted-foreground">
-              <span className="inline-flex items-center gap-1">
-                <span className={cn(
-                  "w-2 h-2 rounded-full",
-                  title.characterCount >= 55 && title.characterCount <= 70 ? "bg-green-500" : "bg-yellow-500"
-                )}></span>
-                {title.characterCount}/70
-              </span>
-              <span className="text-muted-foreground/50">•</span>
-              <span className="capitalize">{title.formula}</span>
+            
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Character count badge */}
+              <Badge 
+                variant={charStatus.variant}
+                className="text-xs font-medium"
+              >
+                {title.characterCount}/70 • {charStatus.label}
+              </Badge>
+              
+              {/* Formula badge */}
+              <Badge variant="outline" className="text-xs">
+                {title.formula}
+              </Badge>
             </div>
           </div>
           
@@ -50,10 +67,13 @@ export function TitleCard({ title }: TitleCardProps) {
             size="icon"
             onClick={handleCopy}
             className={cn(
-              "flex-shrink-0 transition-all duration-200 active:scale-95",
-              copied ? "text-green-500" : "text-muted-foreground hover:text-foreground"
+              "flex-shrink-0 transition-all duration-200 active:scale-95 rounded-full",
+              copied 
+                ? "text-success bg-success/10 hover:bg-success/20" 
+                : "text-muted-foreground hover:text-foreground hover:bg-accent"
             )}
             title={copied ? "Copied!" : "Copy to clipboard"}
+            aria-label={copied ? "Title copied to clipboard" : "Copy title to clipboard"}
           >
             {copied ? (
               <CheckCircle className="w-4 h-4" />

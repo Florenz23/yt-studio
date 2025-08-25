@@ -13,6 +13,8 @@ import { trpc } from './TRPCProvider';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export function TitleGenerator() {
   const [description, setDescription] = useState(DEFAULT_DESCRIPTION);
@@ -97,25 +99,36 @@ export function TitleGenerator() {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-8">
+    <div className="w-full max-w-4xl mx-auto space-y-8 animate-fade-in">
       {/* Header */}
-      <div className="text-center space-y-4">
-        <h1 className="text-4xl sm:text-5xl font-bold text-foreground">
-          YouTube Title Generator
-        </h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          Generate 5 high-converting YouTube title variations (55-70 characters) using proven viral formulas and psychological triggers
-        </p>
-      </div>
-
-      {/* Generation Counter */}
-      {user && generationData && (
-        <div className="text-center">
-          <p className="text-muted-foreground text-sm">
-            Generations remaining: <span className="font-semibold text-foreground">{generationData.remaining}</span> / {generationData.limit}
+      <div className="text-center space-y-6">
+        <div className="space-y-4">
+          <h1 className="text-4xl sm:text-5xl font-bold text-foreground tracking-tight">
+            YouTube Title Generator
+          </h1>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            Generate 5 high-converting YouTube title variations (55-70 characters) using proven viral formulas and psychological triggers
           </p>
         </div>
-      )}
+
+        {/* Generation Counter */}
+        {user && generationData && (
+          <div className="flex justify-center">
+            <Badge 
+              variant={generationData.remaining > 5 ? "success" : generationData.remaining > 2 ? "warning" : "destructive"}
+              className="text-sm px-4 py-2"
+            >
+              {generationData.remaining} / {generationData.limit} generations remaining
+            </Badge>
+          </div>
+        )}
+        
+        {loading && !user && (
+          <div className="flex justify-center">
+            <Skeleton className="h-6 w-48" />
+          </div>
+        )}
+      </div>
 
       {/* Input Section */}
       <Card>
@@ -134,53 +147,125 @@ export function TitleGenerator() {
             className="min-h-[120px] resize-none"
           />
           
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <Button
+              size="lg"
               onClick={user ? handleGenerate : () => setShowAuthModal(true)}
               disabled={(!user && loading) || (!!user && (!description.trim() || isGenerating || (generationData?.remaining === 0)))}
-              className="flex items-center gap-2"
+              loading={isGenerating}
+              className="flex-1 sm:flex-initial"
             >
-              {user ? (
-                <Wand2 className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
-              ) : (
-                <Lock className="w-4 h-4" />
+              {!isGenerating && (
+                user ? (
+                  <Wand2 className="w-4 h-4 mr-2" />
+                ) : (
+                  <Lock className="w-4 h-4 mr-2" />
+                )
               )}
-              {user && isGenerating ? 'Generating...' : 
-               user && generationData?.remaining === 0 ? 'Limit Reached' : 
-               'Generate Titles'}
+              {user && isGenerating ? 'Generating Amazing Titles...' : 
+               user && generationData?.remaining === 0 ? 'Generation Limit Reached' : 
+               user ? 'Generate Viral Titles' : 'Sign In to Generate Titles'}
             </Button>
             
             {titles.length > 0 && user && (
               <Button
                 variant="outline"
+                size="lg"
                 onClick={handleRegenerate}
                 disabled={isGenerating}
-                className="flex items-center gap-2"
+                loading={isGenerating}
               >
-                <RotateCcw className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
+                {!isGenerating && <RotateCcw className="w-4 h-4 mr-2" />}
                 Regenerate
               </Button>
             )}
           </div>
+          
+          {!user && !loading && (
+            <div className="p-4 rounded-lg border border-border bg-muted/30 text-center">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-muted mb-3">
+                <Lock className="w-5 h-5 text-muted-foreground" />
+              </div>
+              <p className="font-medium text-foreground mb-1">Authentication Required</p>
+              <p className="text-sm text-muted-foreground">
+                Sign in to start generating viral YouTube titles
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
 
       {/* Results Section */}
-      {titles.length > 0 && (
+      {isGenerating && (
         <Card>
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Generated Titles</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Wand2 className="w-5 h-5 animate-spin text-primary" />
+              Generating Your Titles...
+            </CardTitle>
+            <CardDescription>
+              Creating viral YouTube titles using advanced AI algorithms
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="space-y-2">
+                <Skeleton className="h-6 w-full" />
+                <div className="flex gap-2">
+                  <Skeleton className="h-4 w-16" />
+                  <Skeleton className="h-4 w-20" />
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
+      
+      {titles.length > 0 && !isGenerating && (
+        <Card className="animate-fade-in">
+          <CardHeader>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <span className="text-2xl">🎯</span>
+                  Generated Titles
+                  <Badge variant="secondary" className="ml-2">
+                    {titles.length}
+                  </Badge>
+                </CardTitle>
+                <CardDescription className="mt-1">
+                  High-converting title variations optimized for YouTube
+                </CardDescription>
+              </div>
               <p className="text-sm text-muted-foreground">
                 Click the copy icon to copy any title
               </p>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4">
-              {titles.map((title) => (
-                <TitleCard key={title.id} title={title} />
+            <div className="space-y-4">
+              {titles.map((title, index) => (
+                <div key={title.id} className="relative animate-fade-in" style={{ animationDelay: `${index * 100}ms` }}>
+                  <TitleCard title={title} />
+                </div>
               ))}
+            </div>
+            
+            {/* Pro tip section */}
+            <div className="mt-6 p-4 rounded-lg bg-info/10 border border-info/20">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-info/20 flex items-center justify-center">
+                  <span className="text-sm">💡</span>
+                </div>
+                <div>
+                  <h4 className="font-medium text-foreground mb-1">Pro Tips for Maximum Impact</h4>
+                  <ul className="text-sm text-muted-foreground space-y-1">
+                    <li>• Titles with 55-70 characters perform best on YouTube</li>
+                    <li>• Test different titles to see which resonates with your audience</li>
+                    <li>• Use urgency and curiosity to drive clicks</li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
