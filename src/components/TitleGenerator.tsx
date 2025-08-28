@@ -104,7 +104,7 @@ export function TitleGenerator() {
       <div className="text-center space-y-6">
         <div className="space-y-4">
           <h1 className="text-4xl sm:text-5xl font-bold text-foreground tracking-tight">
-            Amazing <strong>YouTube Title Generator</strong>
+            <strong>YouTube Title Generator</strong>
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Generate 5 high-converting YouTube title variations (55-70 characters) using proven viral formulas and psychological triggers
