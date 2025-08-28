@@ -107,3 +107,8 @@ model events {
 - Ensure all environment variables are set in Vercel dashboard
 - Database migrations run automatically via Prisma
 - Uses pnpm as package manager (specified in package.json)
+
+
+## Git and Versioning
+
+whenever I write "commit" run the git-commit-writer subagent todo the commit for me 

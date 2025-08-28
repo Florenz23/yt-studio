@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { router, publicProcedure } from '../trpc';
 import { prisma } from '@/lib/prisma';
 
-export const GENERATION_LIMIT = 10;
+export const GENERATION_LIMIT = 20;
 
 export const eventsRouter = router({
   trackEvent: publicProcedure

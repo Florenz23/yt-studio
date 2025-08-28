@@ -45,4 +45,4 @@ export async function getUserGenerationCount(userId: string): Promise<number> {
   }
 }
 
-export const GENERATION_LIMIT = 10
+export const GENERATION_LIMIT = 20
