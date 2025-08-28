@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Amazing YouTube Title Generator - Create Viral Video Titles",
+  title: "YouTube Title Generator - Create Viral Video Titles",
   description: "Generate 5 high-converting YouTube title variations using proven viral formulas and psychological triggers to maximize click-through rates.",
 };
 
