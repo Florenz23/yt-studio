@@ -13,7 +13,7 @@ Creates funny Slack messages based on team member's current weather.
 
 2. Run the weather script using `python3` (not `python`):
 ```bash
-cd /Users/flo/dev/personal/projects/next/yt-studio/.claude/skills/cheer-up-team && python3 get_weather.py CityName
+cd /Users/flo/dev/personal/projects/next/yt-studio/.claude/skills/cheer-up-team/scripts && python3 get_weather.py CityName
 ```
 
 3. Create a funny, encouraging Slack message based on the weather!
